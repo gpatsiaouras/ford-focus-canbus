@@ -36,20 +36,10 @@ void loop() {
   if (mcp2515.readMessage(&canMsg) == MCP2515::ERROR_OK) // To receive data (Poll Read)
   {
     if (canMsg.can_id == CAN_ID_STATE_PARK_REV) {
-      const int state_int = canMsg.data[3];
-      if (state_int == 0x00) {
-        digitalWrite(reverse_trigger_pin, DISENGAGED);
-        digitalWrite(park_brake_trigger_pin, DISENGAGED);
-      } else if (state_int == 0x01) {
-        digitalWrite(reverse_trigger_pin, DISENGAGED);
-        digitalWrite(park_brake_trigger_pin, ENGAGED);
-      } else if (state_int == 0x02) {
-        digitalWrite(reverse_trigger_pin, ENGAGED);
-        digitalWrite(park_brake_trigger_pin, DISENGAGED);
-      } else if (state_int == 0x03) {
-        digitalWrite(reverse_trigger_pin, ENGAGED);
-        digitalWrite(park_brake_trigger_pin, ENGAGED);
-      }
+      Status status;
+      memcpy(status.bytes, canMsg.data, sizeof(status));
+      digitalWrite(park_brake_trigger_pin, status.parking_en);
+      digitalWrite(reverse_trigger_pin, status.reverse_en);
     }
   }
   // debug_print_illum();
