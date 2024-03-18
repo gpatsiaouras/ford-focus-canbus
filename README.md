@@ -1,5 +1,12 @@
 # Ford Focus mk2 2005 - Canbus module
-> THIS PROJECT IS A WORK IN PROGRESS
+
+## Status - 
+- [x] Convert illumination PWM to 12V trigger (on/off)
+- [x] Detect parking brake and reverse gear. Camera turns on when reverse gear is engaged and off when disengaged. Parking brake is used in android auto for keyboard/voice-only input in Google Maps.
+- [ ] Find speed and distance travel in the canbus.
+- [ ] Add logic for intelligent camera on/off.
+- [ ] Implement auto lock function based on speed.
+
 ## Description
 <!-- ![alt text](docs/img/android_auto.jpg "Pioneer SPH-DA360DAB") -->
 This project started after I upgraded my CD6000 ford focus radio to the Pioneer SPH-DA360DAB head unit.
@@ -60,7 +67,7 @@ Actual module:
 
 For the arduino code and for reading the PWM, this library is being used: https://github.com/xkam1x/Arduino-PWM-Reader. Download the two files `PWM.hpp` and `PWM.cpp` and add them next to the `ford_focus_canbus.ino`.
 
-Additionally, you need the mcp2515 library for interfacing with the canbus module. You can find it here: https://github.com/autowp/arduino-mcp2515
+Additionally, you need the mcp2515 library for interfacing with the canbus module. You can find it here: https://github.com/coryjfowler/MCP_CAN_lib
 
 
 ## Installation
