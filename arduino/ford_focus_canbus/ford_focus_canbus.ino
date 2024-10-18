@@ -19,6 +19,8 @@ EngineStatus engine_status;
 // Camera system
 bool reverse_trigger_override = false;
 bool reverse_gear_engaged = false;
+unsigned long reverse_gear_engaged_start = 0;
+bool reversed_gear_engaged_before = false;
 
 void setup()
 {
@@ -51,6 +53,61 @@ int camera_button_is_pressed() {
   return !digitalRead(in_second_cam_button_pin);
 }
 
+bool camera_countdown_active() {
+  return reverse_gear_engaged_start > 0;
+}
+
+bool ten_seconds_passed_with_camera_on() {
+  return millis() > reverse_gear_engaged_start + 10 * 1000;
+}
+
+void control_reverse_trigger() {
+  reverse_gear_engaged = status.reverse_en;
+  if (reverse_gear_engaged) {
+    // Driver engaged reverse, switch to reverse even if the button is on.
+    // Serial.println("Turning on reverse camera.");
+    digitalWrite(cameras_relay, LOW);
+    reverse_gear_engaged_start = millis();
+    digitalWrite(reverse_trigger_pin, ACTIVE);
+  }
+
+  reversed_gear_engaged_before = status.reverse_en;
+
+  if (camera_countdown_active() && ten_seconds_passed_with_camera_on()) {
+    // Serial.println("Countdown finish turning off camera.");
+    digitalWrite(reverse_trigger_pin, INACTIVE);
+    reverse_gear_engaged_start = 0;
+    return;
+  }
+
+  // If reverse override is active then don't turn off the trigger for the reverse.
+  if (reverse_trigger_override) return;
+}
+
+void read_second_camera_button()
+{
+  // Don't do anything if reverse gear is active
+  // driver parking has priority.
+  if (reverse_gear_engaged) return;
+  if (camera_countdown_active()) {
+    // Serial.println("Camera countdown active, will not switch to baby.");
+    return;
+  }
+
+  if (camera_button_is_pressed())
+  {
+    digitalWrite(cameras_relay, HIGH);
+    digitalWrite(reverse_trigger_pin, ACTIVE);
+    reverse_trigger_override = true;
+  }
+  else
+  {
+    digitalWrite(cameras_relay, LOW);
+    reverse_trigger_override = false;
+    digitalWrite(reverse_trigger_pin, INACTIVE);
+  }
+}
+
 void read_canbus()
 {
   if (!digitalRead(CAN0_INT))
@@ -62,12 +119,7 @@ void read_canbus()
 
       digitalWrite(park_brake_trigger_pin, !status.parking_en);
       digitalWrite(out_illum_pin, !status.lights_on);
-      reverse_gear_engaged = status.reverse_en;
-
-      // Driver engaged reverse, switch to reverse even if the button is on.
-      if (reverse_gear_engaged) digitalWrite(cameras_relay, LOW);
-      // If reverse override is active then don't turn off the trigger for the reverse.
-      if (!reverse_trigger_override) digitalWrite(reverse_trigger_pin, !status.reverse_en);
+      control_reverse_trigger();
     }
     else if (rxId == CAN_ID_STATE_SEATBELTS)
     {
@@ -89,26 +141,6 @@ void read_canbus()
     {
       memcpy(something_status.bytes, rxBuf, sizeof(something_status));
     }
-  }
-}
-
-void read_second_camera_button()
-{
-  // Don't do anything if reverse gear is active
-  // driver parking has priority.
-  if (reverse_gear_engaged) return;
-
-  if (camera_button_is_pressed())
-  {
-    digitalWrite(cameras_relay, HIGH);
-    digitalWrite(reverse_trigger_pin, ACTIVE);
-    reverse_trigger_override = true;
-  }
-  else
-  {
-    digitalWrite(cameras_relay, LOW);
-    reverse_trigger_override = false;
-    // Canbus will turn off the trigger.
   }
 }
 
