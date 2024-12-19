@@ -64,11 +64,4 @@ Actual module:
 > NOTE: I used a arduino nano with usb c for convenience. But the picture is different in fritzing.
 
 ## Requirements
-
-For the arduino code and for reading the PWM, this library is being used: https://github.com/xkam1x/Arduino-PWM-Reader. Download the two files `PWM.hpp` and `PWM.cpp` and add them next to the `ford_focus_canbus.ino`.
-
-Additionally, you need the mcp2515 library for interfacing with the canbus module. You can find it here: https://github.com/coryjfowler/MCP_CAN_lib
-
-
-## Installation
-Copy paste `arduino/ford_focus_canbus` to your `Arduino` directory, in order to compile and flash to your arduino.
+- mcp2515 library for interfacing with the canbus module. You can find it here: https://github.com/coryjfowler/MCP_CAN_lib

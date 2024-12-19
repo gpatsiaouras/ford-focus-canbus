@@ -14,7 +14,7 @@ const int INACTIVE = 1;
 
 union Status
 {
-  struct __attribute__((__packed__)) //packed means that the struct will have exactly the ssize of bytes it contains
+  struct __attribute__((__packed__)) //packed means that the struct will have exactly the size of bytes it contains
   {
     uint8_t unknown_1:1;
     uint8_t unknown_2:1;
@@ -54,7 +54,7 @@ union Status
 
 union EngineStatus
 {
-  struct __attribute__((__packed__)) //packed means that the struct will have exactly the ssize of bytes it contains
+  struct __attribute__((__packed__)) //packed means that the struct will have exactly the size of bytes it contains
   {
     uint16_t rpm; // x4
     uint8_t third_byte;
@@ -68,7 +68,7 @@ union EngineStatus
 
 union SeatbeltsStatus
 {
-  struct __attribute__((__packed__)) //packed means that the struct will have exactly the ssize of bytes it contains
+  struct __attribute__((__packed__)) //packed means that the struct will have exactly the size of bytes it contains
   {
     uint8_t first_byte;
 
@@ -95,7 +95,7 @@ union SeatbeltsStatus
 
 union SomethingStatus
 {
-  struct __attribute__((__packed__)) //packed means that the struct will have exactly the ssize of bytes it contains
+  struct __attribute__((__packed__)) //packed means that the struct will have exactly the size of bytes it contains
   {
     uint8_t first_bit_1:1;
     uint8_t first_bit_2:1;

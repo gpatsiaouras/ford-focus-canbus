@@ -89,6 +89,8 @@ void read_second_camera_button()
   // Don't do anything if reverse gear is active
   // driver parking has priority.
   if (reverse_gear_engaged) return;
+
+  // Don't do anything is still in parking state
   if (camera_countdown_active()) {
     // Serial.println("Camera countdown active, will not switch to baby.");
     return;
@@ -96,8 +98,12 @@ void read_second_camera_button()
 
   if (camera_button_is_pressed())
   {
+    // Switch to the second camera and activate trigger
     digitalWrite(cameras_relay, HIGH);
     digitalWrite(reverse_trigger_pin, ACTIVE);
+    // Notify system that the second camera is on
+    // In this case the canbus will not turn off the trigger
+    // because reverse gear is not engaged.
     reverse_trigger_override = true;
   }
   else
