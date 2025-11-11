@@ -65,5 +65,18 @@ Actual module:
 
 > NOTE: I used a arduino nano with usb c for convenience. But the picture is different in fritzing.
 
+## Helper scripts
+### Decoding the canbus speed
+In order to decode the speed of the car from the canbus which was sitting in the 5th and 6th byte, I made a python script
+that was retrieving the speed from both an obd module and the canbus. Then I used some approximation to create the formula needed.
+The files are saved in the helper_scripts/obd2-tools directory.
+
+To do the sync
+
+1. Start the time_sync.py
+2. Drive the car in various speeds
+3. Use the `cleanup_file.py` to remove duplicate files and make it smaller
+4. Now you have the data to find the formula.
+
 ## Requirements
 - mcp2515 library for interfacing with the canbus module. You can find it here: https://github.com/coryjfowler/MCP_CAN_lib
