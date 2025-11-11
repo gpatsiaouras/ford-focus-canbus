@@ -15,6 +15,8 @@ Status status;
 SeatbeltsStatus seatbelts_status;
 SomethingStatus something_status;
 EngineStatus engine_status;
+PedalsStatus pedals_status;
+CruiseControl cruise_control;
 
 // Camera system
 bool reverse_trigger_override = false;
@@ -61,6 +63,10 @@ bool ten_seconds_passed_with_camera_on() {
   return millis() > reverse_gear_engaged_start + 10 * 1000;
 }
 
+bool speed_is_over_10() {
+  return getSpeedKPH(engine_status) > 20;
+}
+
 void control_reverse_trigger() {
   reverse_gear_engaged = status.reverse_en;
   if (reverse_gear_engaged) {
@@ -73,7 +79,7 @@ void control_reverse_trigger() {
 
   reversed_gear_engaged_before = status.reverse_en;
 
-  if (camera_countdown_active() && ten_seconds_passed_with_camera_on()) {
+  if ((camera_countdown_active() && ten_seconds_passed_with_camera_on()) || (speed_is_over_10() && !reverse_gear_engaged)) {
     // Serial.println("Countdown finish turning off camera.");
     digitalWrite(reverse_trigger_pin, INACTIVE);
     reverse_gear_engaged_start = 0;
@@ -134,24 +140,56 @@ void read_canbus()
     else if (rxId == CAN_ID_STATE_ENGINE)
     {
       memcpy(engine_status.bytes, rxBuf, sizeof(engine_status));
-      // Serial.print("RPM: ");
-      // Serial.print(engine_status.rpm / 4);
-      // Serial.print("Speed: ");
-      // Serial.print(engine_status.speed);
-      // Serial.print(" Throttle: ");
-      // Serial.println(engine_status.throttle);
-      // speed = something
-      // odo = something
     }
     else if (rxId == CAN_ID_STATE_SOMETHING)
     {
       memcpy(something_status.bytes, rxBuf, sizeof(something_status));
     }
+    else if (rxId == CAN_ID_STATE_PEDALS)
+    {
+      memcpy(pedals_status.bytes, rxBuf, sizeof(pedals_status));
+    }
+    else if (rxId == CAN_ID_CRUISE_CONTROL)
+    {
+      memcpy(cruise_control.bytes, rxBuf, sizeof(cruise_control));
+    }
   }
+}
+
+void debugEngineStatus()
+{
+  Serial.print("RPM: ");
+  Serial.print(getRPM(engine_status));
+  Serial.print(" Speed: ");
+  Serial.print(getSpeedKPH(engine_status));
+  Serial.print(" Throttle: ");
+  Serial.println(engine_status.throttle);
+}
+
+void debugCruiseControlStatus()
+{
+  Serial.print("CC Off: ");
+  Serial.print(cruise_control.btn_cc_off);
+  Serial.print(" CC On: ");
+  Serial.print(cruise_control.btn_cc_on);
+  Serial.print(" CC minus: ");
+  Serial.print(cruise_control.btn_cc_minus);
+  Serial.print(" CC plus: ");
+  Serial.print(cruise_control.btn_cc_plus);
+  Serial.print(" CC res: ");
+  Serial.print(cruise_control.btn_cc_res);
+  Serial.print(" Clutch: ");
+  Serial.print(pedals_status.clutch_pedal_pressed);
+  Serial.print(" Brake: ");
+  Serial.print(pedals_status.brake_pedal_pressed);
+  Serial.print("");
 }
 
 void loop()
 {
   read_second_camera_button();
   read_canbus();
+
+  // debugEngineStatus();
+  // debugCruiseControlStatus();
 }

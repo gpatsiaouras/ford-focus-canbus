@@ -3,8 +3,10 @@
 ## Status - 
 - [x] Convert illumination PWM to 12V trigger (on/off)
 - [x] Detect parking brake and reverse gear. Camera turns on when reverse gear is engaged and off when disengaged. Parking brake is used in android auto for keyboard/voice-only input in Google Maps.
-- [ ] Find speed and distance travel in the canbus.
-- [ ] Add logic for intelligent camera on/off.
+- [x] Find speed in the canbus.
+- [x] Turn off camera if speed more than 20km/h
+- [ ] Find distance travelled in canbus.
+- [ ] Turn off camera if distance travelled is more than 20m
 - [ ] Implement auto lock function based on speed.
 
 ## Description
